@@ -1,8 +1,6 @@
 import streamlit as st
 import docx
-import os
 from PyPDF2 import PdfReader
-from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -13,7 +11,6 @@ from transformers import pipeline
 
 def main():
     st.title("TextGenius: Summarization & QA")
-    load_dotenv()
     
     text = ""
 
@@ -47,40 +44,30 @@ def main():
 
     option = st.selectbox("", ("None","Summarize", "Chat"))
     
-    text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
-            length_function=len
-            )
-    chunks = text_splitter.split_text(text=text)
-
-    
-    # embeddings = OpenAIEmbeddings()
-    # VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
+    if text != "":    
+        model_name = "facebook/bart-large-cnn"
+        if option == "Summarize":
+            length_mapping = {
+                "Short": (100, 150),    
+                "Medium": (150, 200),
+                "Long": (200, 300)
+            }
+            length = st.selectbox("Choose length:", ("Short", "Medium","Long"))
+            min_length, max_length = length_mapping[length]
+            if st.button("Generate Summary"):
+                summarizer = pipeline("summarization", model = model_name)
+                summary = summarizer(textInput, max_length=max_length, min_length=min_length)
+                st.subheader("Generated Summary:")
+                st.write(summary[0]['summary_text'])
+        elif option == "Chat":
+            query = st.text_input("Ask questions about your file:")
+            if query:
+                qa_pipeline = pipeline("question-answering",model=model_name)
+                context = textInput
+                answer = qa_pipeline(question=query, context=context)
+                st.write("Question:", query)
+                st.write("Answer:", answer['answer'])
         
-    model_name = "facebook/bart-large-cnn"
-    if option == "Summarize":
-        length_mapping = {
-            "Short": (100, 150),    
-            "Medium": (150, 200),
-            "Long": (200, 300)
-        }
-        length = st.selectbox("Choose length:", ("Short", "Medium","Long"))
-        min_length, max_length = length_mapping[length]
-        if st.button("Generate Summary"):
-            summarizer = pipeline("summarization", model = model_name)
-            summary = summarizer(textInput, max_length=max_length, min_length=min_length)
-            st.subheader("Generated Summary:")
-            st.write(summary[0]['summary_text'])
-    elif option == "Chat":
-        query = st.text_input("Ask questions about your file:")
-        if query:
-            qa_pipeline = pipeline("question-answering",model=model_name)
-            context = textInput
-            answer = qa_pipeline(question=query, context=context)
-            st.write("Question:", query)
-            st.write("Answer:", answer['answer'])
-    
 
 
 

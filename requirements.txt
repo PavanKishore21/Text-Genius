@@ -1,0 +1,5 @@
+streamlit
+docx
+PyPDF2
+langchain
+transformers
