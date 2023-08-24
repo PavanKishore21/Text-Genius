@@ -1,5 +1,5 @@
 import streamlit as st
-import docx
+# import docx
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -25,14 +25,14 @@ def main():
                 pdf_reader = PdfReader(pdf)
                 for page in pdf_reader.pages:
                     text += page.extract_text()
-        if filetype == "Word":
-            uploaded_file = st.file_uploader("", type=["docx"])
-            if uploaded_file is not None: 
-                doc = docx.Document(uploaded_file)
-                content = []
-                for paragraph in doc.paragraphs:
-                    content.append(paragraph.text)
-                text = content
+        # if filetype == "Word":
+        #     uploaded_file = st.file_uploader("", type=["docx"])
+        #     if uploaded_file is not None: 
+        #         doc = docx.Document(uploaded_file)
+        #         content = []
+        #         for paragraph in doc.paragraphs:
+        #             content.append(paragraph.text)
+        #         text = content
 
         st.write("###  Enter text manually:")
         if text == "":
