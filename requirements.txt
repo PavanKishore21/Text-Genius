@@ -1,8 +1,6 @@
 streamlit
-docx
+python-docx
 PyPDF2
-langchain
 transformers
 tensorflow
 torch 
-exception
